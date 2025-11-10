@@ -64,7 +64,7 @@ def descomponer(expresion):
 
 
 # -----------------------
-expresion = 'a + b - (h * (c - d) + (e * (f / g)))'
+expresion = 'v_a + v_b - (v_h * (v_c - v_d) + (v_e * (v_f / v_g)))'
 resultado = descomponer(expresion)
 for r in resultado:
     print(r)
