@@ -52,19 +52,48 @@ def descomponer(expresion):
         der_temp, contador = procesar(derecha, instrucciones, contador)
 
         Tk = f"T{contador}"
-        instrucciones.append(f"[{Tk} = {izq_temp} {op} {der_temp}]")
+        instrucciones.append(f"[{izq_temp} = {izq_temp} {op} {der_temp}]")
         contador += 1
-        return Tk, contador
+        return izq_temp, contador
 
     instrucciones = []
     procesar(expresion, instrucciones, 1)
     return instrucciones
 
 
+def escritura(salida):
+    archivo = open("salida.txt", "w")
+    for linea in salida:
+        archivo.write(linea + "\n")
+    archivo.close()
+    return
 
+def traduccion(resultado):
+    salida = []
+    for i in range(len(resultado)):
+        ecuacion = resultado[i].split()
+        salida.append(f"MOV A, {ecuacion[ecuacion.index('=') + 1]}")
+        salida.append(f"MOV B, {ecuacion[ecuacion.index('=') + 3][:-1]}")
+
+        operador = ecuacion[ecuacion.index('=') + 2]
+        if operador == '+':
+            salida.append("ADD A, B")
+        elif operador == '-':
+            salida.append("SUB A, B")
+        elif operador == '*':
+            salida.append("MUL A, B")
+        elif operador == '/':
+            salida.append("DIV A, B")
+        
+        salida.append(f"MOV {ecuacion[ecuacion.index('=') + 1]}, A")
+        salida.append("")
+    salida.append(f"MOV result, {ecuacion[ecuacion.index('=') + 1]}")
+    return salida
 
 # -----------------------
 expresion = 'v_a + v_b - (v_h * (v_c - v_d) + (v_e * (v_f / v_g)))'
 resultado = descomponer(expresion)
 for r in resultado:
     print(r)
+salida = traduccion(resultado)
+escritura(salida)
