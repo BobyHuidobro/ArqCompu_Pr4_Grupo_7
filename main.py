@@ -72,10 +72,14 @@ def traduccion(resultado):
     salida = []
     for i in range(len(resultado)):
         ecuacion = resultado[i].split()
-        salida.append(f"MOV A, {ecuacion[ecuacion.index('=') + 1]}")
-        salida.append(f"MOV B, {ecuacion[ecuacion.index('=') + 3][:-1]}")
-
+        destino = ecuacion[ecuacion.index('=') - 1][1:]
+        op1 = ecuacion[ecuacion.index('=') + 1]
+        op2 = ecuacion[ecuacion.index('=') + 3][:-1]
         operador = ecuacion[ecuacion.index('=') + 2]
+
+        salida.append(f"MOV A, ({op1})")
+        salida.append(f"MOV B, ({op2})")
+
         if operador == '+':
             salida.append("ADD A, B")
         elif operador == '-':
@@ -85,11 +89,12 @@ def traduccion(resultado):
         elif operador == '/':
             salida.append("DIV A, B")
         
-        salida.append(f"MOV {ecuacion[ecuacion.index('=') + 1]}, A")
+        salida.append(f"MOV ({destino}), A")
         salida.append("")
-    salida.append(f"MOV result, {ecuacion[ecuacion.index('=') + 1]}")
+    salida.append(f"MOV A, ({destino})")
+    salida.append(f"MOV (result), A")
     return salida
 
 # -----------------------
-expresion = 'v_a + v_b'
+expresion = '((v_a + v_b) - (v_c - v_d)) + (v_e - (v_f - v_g))'
 escritura(traduccion(descomponer(expresion)))

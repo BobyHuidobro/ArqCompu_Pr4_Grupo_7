@@ -1,6 +1,32 @@
-MOV A, v_a
-MOV B, v_b
+MOV A, (v_a)
+MOV B, (v_b)
 ADD A, B
-MOV v_a, A
+MOV (v_a), A
 
-MOV result, v_a
+MOV A, (v_c)
+MOV B, (v_d)
+SUB A, B
+MOV (v_c), A
+
+MOV A, (v_a)
+MOV B, (v_c)
+SUB A, B
+MOV (v_a), A
+
+MOV A, (v_f)
+MOV B, (v_g)
+SUB A, B
+MOV (v_f), A
+
+MOV A, (v_e)
+MOV B, (v_f)
+SUB A, B
+MOV (v_e), A
+
+MOV A, (v_a)
+MOV B, (v_e)
+ADD A, B
+MOV (v_a), A
+
+MOV A, (v_a)
+MOV (result), A
