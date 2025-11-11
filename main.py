@@ -51,7 +51,6 @@ def descomponer(expresion):
         izq_temp, contador = procesar(izquierda, instrucciones, contador)
         der_temp, contador = procesar(derecha, instrucciones, contador)
 
-        Tk = f"T{contador}"
         instrucciones.append(f"[{izq_temp} = {izq_temp} {op} {der_temp}]")
         contador += 1
         return izq_temp, contador
