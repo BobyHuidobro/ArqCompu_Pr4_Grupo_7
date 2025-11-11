@@ -91,5 +91,5 @@ def traduccion(resultado):
     return salida
 
 # -----------------------
-expresion = 'v_a + v_b - (v_h * (v_c - v_d) + (v_e * (v_f / v_g)))'
+expresion = 'v_a + v_b'
 escritura(traduccion(descomponer(expresion)))
