@@ -95,5 +95,6 @@ def traduccion(resultado):
     return salida
 
 # -----------------------
-expresion = '((v_a + v_b) - (v_c - v_d)) + (v_e - (v_f - v_g))'
+# expresion = input("Inserta la expresión: ")
+expresion = 'v_a - (v_b + v_c -v_d)'
 escritura(traduccion(descomponer(expresion)))
