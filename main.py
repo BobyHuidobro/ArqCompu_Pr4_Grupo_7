@@ -15,6 +15,7 @@ def descomponer(expresion):
         for i, c in reversed(candidatos):
             if c in '+-':
                 return i, c
+
         for i, c in reversed(candidatos):
             if c in '*/':
                 return i, c
@@ -22,6 +23,7 @@ def descomponer(expresion):
 
     def limpiar_parentesis(expr):
         while expr.startswith('(') and expr.endswith(')'):
+
             prof = 0
             balanceado = True
             for i, c in enumerate(expr):
@@ -49,23 +51,21 @@ def descomponer(expresion):
         izq_temp, contador = procesar(izquierda, instrucciones, contador)
         der_temp, contador = procesar(derecha, instrucciones, contador)
 
-        tmp = f"v_tmp{contador}"
-        instrucciones.append(f"[{tmp} = {izq_temp} {op} {der_temp}]")
+        instrucciones.append(f"[{izq_temp} = {izq_temp} {op} {der_temp}]")
         contador += 1
-        return tmp, contador
+        return izq_temp, contador
 
     instrucciones = []
-    _, total = procesar(expresion, instrucciones, 1)
-    print(f"Cantidad de variables temporales necesarias: {total - 1}")
-    return instrucciones, total - 1
+    procesar(expresion, instrucciones, 1)
+    return instrucciones
 
 
 def escritura(salida):
-    with open("salida.txt", "w") as archivo:
-        for linea in salida:
-            archivo.write(linea + "\n")
+    archivo = open("salida.txt", "w")
+    for linea in salida:
+        archivo.write(linea + "\n")
+    archivo.close()
     return
-
 
 def traduccion(resultado):
     salida = []
@@ -87,18 +87,13 @@ def traduccion(resultado):
             salida.append("MUL A, B")
         elif operador == '/':
             salida.append("DIV A, B")
-
+        
         salida.append(f"MOV ({destino}), A")
         salida.append("")
-
-    ultimo_destino = resultado[-1].split()[0][1:]
-    salida.append(f"MOV A, ({ultimo_destino})")
-    salida.append("MOV (result), A")
+    salida.append(f"MOV A, ({destino})")
+    salida.append(f"MOV (result), A")
     return salida
-
 
 # -----------------------
 expresion = '((v_a + v_b) - (v_c - v_d)) + (v_e - (v_f - v_g))'
-resultado, cantidad_tmp = descomponer(expresion)
-salida = traduccion(resultado)
-escritura(salida)
+escritura(traduccion(descomponer(expresion)))
