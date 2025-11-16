@@ -10,7 +10,10 @@ def shunting_yard(expresion):
         elif token in functions:
             operators.append(token)
         elif token in precedence:
-            while (operators and operators[-1] != '(' and (precedence[operators[-1]] >= precedence[token])):
+            while (operators 
+                    and operators[-1] != '(' 
+                    and operators[-1] not in functions 
+                    and precedence[operators[-1]] >= precedence[token]):
                 output.append(operators.pop())
             operators.append(token)
         elif token == ',':
@@ -37,33 +40,152 @@ def escritura(salida):
 
 def traduccion(resultado):
     salida = []
-    for i in range(len(resultado)):
-        ecuacion = resultado[i].split()
-        destino = ecuacion[ecuacion.index('=') - 1][1:]
-        op1 = ecuacion[ecuacion.index('=') + 1]
-        op2 = ecuacion[ecuacion.index('=') + 3][:-1]
-        operador = ecuacion[ecuacion.index('=') + 2]
+    operadores = {'+', '-', '*', '/', '%'}
+    for token in resultado:
+        if token.startswith('v_'):
+            salida.append(f"MOV A, ({token})")
+            salida.append("PUSH A")
 
-        salida.append(f"MOV A, ({op1})")
-        salida.append(f"MOV B, ({op2})")
+        elif token in operadores:
+            if token == '+':
+                salida.append("POP B")
+                salida.append("POP A")
+                salida.append("ADD A, B")
+            elif token == '-':
+                salida.append("POP B")
+                salida.append("POP A")
+                salida.append("SUB A, B")
+            elif token == '*':
+                salida.extend(rutina_mul())
+            elif token == '/':
+                salida.extend(rutina_div())
+            elif token == '%':
+                salida.extend(rutina_mod())
+            salida.append("PUSH A")
 
-        if operador == '+':
-            salida.append("ADD A, B")
-        elif operador == '-':
-            salida.append("SUB A, B")
-        elif operador == '*':
-            salida.append("MUL A, B")
-        elif operador == '/':
-            salida.append("DIV A, B")
-        
-        salida.append(f"MOV ({destino}), A")
-        salida.append("")
-    salida.append(f"MOV A, ({destino})")
+        elif token == 'abs':
+            salida.extend(rutina_abs())
+
+        elif token in {'max', 'min'}:
+            salida.append("POP B")
+            salida.append("POP A")
+            salida.append("CMP A, B")
+            if token == 'max':
+                salida.extend(rutina_max())
+            if token == 'min':
+                salida.extend(rutina_min())
+    salida.append("POP A")
     salida.append(f"MOV (result), A")
     return salida
 
+def rutina_mul():
+    return [
+        "POP B",
+        "POP A",
+        "PUSH 0",            # acumulador
+
+        "mul_loop:",
+        "CMP B, 0",
+        "JEQ mul_end",
+
+        "POP C",
+        "ADD C, A",
+        "PUSH C",
+
+        "MOV C, 1",
+        "SUB B, C",
+        "JMP mul_loop",
+
+        "mul_end:",
+        "POP A",
+        "PUSH A"
+    ]
+
+
+def rutina_div():
+    return [
+        "POP B",     # divisor
+        "POP A",     # dividendo
+        "PUSH 0",    # cociente
+
+        "div_loop:",
+        "CMP A, B",
+        "JLT div_end",
+
+        "SUB A, B",
+
+        "POP C",
+        "INC C",
+        "PUSH C",
+
+        "JMP div_loop",
+
+        "div_end:",
+        "POP A",
+        "PUSH A"
+    ]
+
+
+def rutina_mod():
+    return [
+        "POP B",
+        "POP A",
+
+        "mod_loop:",
+        "CMP A, B",
+        "JLT mod_end",
+
+        "SUB A, B",
+        "JMP mod_loop",
+
+        "mod_end:",
+        "PUSH A"
+    ]
+
+
+def rutina_abs():
+    return [
+        "POP A",
+        "CMP A, 0",
+        "JGE abs_end",
+        "MOV B, 0",
+        "SUB B, A",
+        "MOV A, B",
+        "abs_end:",
+        "PUSH A"
+    ]
+
+
+def rutina_min():
+    return [
+        "POP B",
+        "POP A",
+        "CMP A, B",
+        "JLE min_is_a",
+        "PUSH B",
+        "JMP min_end",
+        "min_is_a:",
+        "PUSH A",
+        "min_end:"
+    ]
+
+
+def rutina_max():
+    return [
+        "POP B",
+        "POP A",
+        "CMP A, B",
+        "JGE max_is_a",
+        "PUSH B",
+        "JMP max_end",
+        "max_is_a:",
+        "PUSH A",
+        "max_end:"
+    ]
+
+
 # -----------------------
-expresion = 'v_a + v_b * v_c / ( v_d - v_e )'
-# expresion = 'v_a - (v_b + v_c - v_d)'
-# escritura(traduccion(descomponer(expresion)))
-print(shunting_yard(expresion))
+expresion = "v_a + v_b * v_c / ( v_d - v_e )"
+rpn = shunting_yard(expresion)
+codigo = traduccion(rpn)
+escritura(codigo)

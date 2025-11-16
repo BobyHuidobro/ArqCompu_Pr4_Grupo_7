@@ -1,17 +1,51 @@
+MOV A, (v_a)
+PUSH A
 MOV A, (v_b)
-MOV B, (v_c)
+PUSH A
+MOV A, (v_c)
+PUSH A
+POP B
+POP A
+PUSH 0
+mul_loop:
+CMP B, 0
+JEQ mul_end
+POP C
+ADD C, A
+PUSH C
+MOV C, 1
+SUB B, C
+JMP mul_loop
+mul_end:
+POP A
+PUSH A
+PUSH A
+MOV A, (v_d)
+PUSH A
+MOV A, (v_e)
+PUSH A
+POP B
+POP A
+SUB A, B
+PUSH A
+POP B
+POP A
+PUSH 0
+div_loop:
+CMP A, B
+JLT div_end
+SUB A, B
+POP C
+INC C
+PUSH C
+JMP div_loop
+div_end:
+POP A
+PUSH A
+PUSH A
+POP B
+POP A
 ADD A, B
-MOV (v_b), A
-
-MOV A, (v_b)
-MOV B, (v_d)
-SUB A, B
-MOV (v_b), A
-
-MOV A, (v_a)
-MOV B, (v_b)
-SUB A, B
-MOV (v_a), A
-
-MOV A, (v_a)
+PUSH A
+POP A
 MOV (result), A
