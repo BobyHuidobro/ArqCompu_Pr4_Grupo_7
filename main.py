@@ -80,49 +80,51 @@ def traduccion(resultado):
 
 def rutina_mul():
     return [
-        "POP B",
-        "POP A",
-        "PUSH 0",            # acumulador
-
+        "POP B",                  # B = multiplicador (cuántas veces sumar)
+        "POP A",                  # A = multiplicando (qué voy a sumar)
+        "MOV (temp_mul), A",      # Guardar multiplicando
+        "MOV A, 0",               # A = 0 (acumulador)
+        
         "mul_loop:",
-        "CMP B, 0",
+        "CMP B, 0",               
         "JEQ mul_end",
-
-        "POP C",
-        "ADD C, A",
-        "PUSH C",
-
-        "MOV C, 1",
-        "SUB B, C",
+        
+        "ADD A, (temp_mul)",      # A = A + multiplicando
+        
+        "PUSH A",                 # Guardar acumulador
+        "MOV A, B",               # A = B (contador actual)
+        "MOV B, 1",               # B = 1
+        "SUB A, B",               # A = contador - 1
+        "MOV B, A",               # B = nuevo contador
+        "POP A",                  # Recuperar acumulador
+        
         "JMP mul_loop",
-
-        "mul_end:",
-        "POP A",
-        "PUSH A"
+        "mul_end:"                
     ]
 
 
 def rutina_div():
     return [
-        "POP B",     # divisor
-        "POP A",     # dividendo
-        "PUSH 0",    # cociente
-
+        "POP B",              # B = divisor
+        "POP A",              # A = dividendo
+        "MOV (temp_div), B",  # Guardar divisor en memoria
+        "MOV B, 0",           # B = cociente = 0
+        
         "div_loop:",
-        "CMP A, B",
-        "JLT div_end",
-
-        "SUB A, B",
-
-        "POP C",
-        "INC C",
-        "PUSH C",
-
+        "PUSH B",             # Guardar cociente
+        "MOV B, (temp_div)",  # B = divisor, guarda temporalmente el divisor durante la división
+        "CMP A, B",           
+        "JLT div_end",        
+        
+        "SUB A, B",           
+        "POP B",              
+        "INC B",              
         "JMP div_loop",
-
+        
         "div_end:",
-        "POP A",
-        "PUSH A"
+        "POP B",              
+        "MOV A, B"         
+
     ]
 
 
@@ -138,8 +140,8 @@ def rutina_mod():
         "SUB A, B",
         "JMP mod_loop",
 
-        "mod_end:",
-        "PUSH A"
+        "mod_end:"
+
     ]
 
 
@@ -185,7 +187,14 @@ def rutina_max():
 
 
 # -----------------------
-expresion = "abs ( v_c )"
+#expresion = "v_a + v_b * v_c - ( v_d / v_e ) + max ( v_f , v_g )"
+#rpn = shunting_yard(expresion)
+#codigo = traduccion(rpn)
+#escritura(codigo)
+
+
+expresion = "v_a + v_b * v_c - ( v_d / v_e ) + max ( v_f , v_g )"
+# v_a = 2, v_b = 3, v_c = 4
 rpn = shunting_yard(expresion)
 codigo = traduccion(rpn)
 escritura(codigo)
