@@ -67,9 +67,9 @@ def traduccion(resultado):
             salida.extend(rutina_abs())
 
         elif token in {'max', 'min'}:
-            salida.append("POP B")
-            salida.append("POP A")
-            salida.append("CMP A, B")
+            #salida.append("POP B")
+            #salida.append("POP A")
+            #salida.append("CMP A, B")
             if token == 'max':
                 salida.extend(rutina_max())
             if token == 'min':
@@ -145,7 +145,7 @@ def rutina_mod():
 
 def rutina_abs():
     return [
-        "POP A",
+       "POP A",
         "CMP A, 0",
         "JGE abs_end",
         "MOV B, 0",
@@ -185,7 +185,7 @@ def rutina_max():
 
 
 # -----------------------
-expresion = "v_a + v_b * v_c / ( v_d - v_e )"
+expresion = "abs ( v_c )"
 rpn = shunting_yard(expresion)
 codigo = traduccion(rpn)
 escritura(codigo)
